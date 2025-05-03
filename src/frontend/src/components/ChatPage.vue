@@ -359,13 +359,17 @@ async function sendWithFile() {
       ? `${inputText.value.trim()} [ファイル: ${selectedFile.value.name}]` 
       : `[ファイル: ${selectedFile.value.name}]`
     
-    // Use chat store directly to push messages
-    chat.messages.value.push({
-      role: 'user',
-      content: fileMessage,
-      hasFile: true,
-      fileName: selectedFile.value.name
-    })
+    // Check if chat store messages array is initialized
+    if (chat && chat.messages && chat.messages.value) {
+      chat.messages.value.push({
+        role: 'user',
+        content: fileMessage,
+        hasFile: true,
+        fileName: selectedFile.value.name
+      })
+    } else {
+      console.error('Chat messages array is not initialized')
+    }
     
     // Reset input
     inputText.value = ''
@@ -385,7 +389,7 @@ async function sendWithFile() {
     console.log('Upload result:', result)
     
     // Add AI response
-    if (result.message) {
+    if (result.message && chat && chat.messages && chat.messages.value) {
       chat.messages.value.push({
         role: 'assistant',
         content: result.message
@@ -398,8 +402,8 @@ async function sendWithFile() {
     
   } catch (err) {
     console.error('File upload error:', err)
-    if (messages && messages.value) {
-      messages.value.push({
+    if (chat && chat.messages && chat.messages.value) {
+      chat.messages.value.push({
         role: 'system',
         content: `ファイルのアップロードに失敗しました: ${err.message}`
       })
