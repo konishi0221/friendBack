@@ -284,12 +284,16 @@ class ChatService
     /* ------------ OpenAI API call ------------ */
     private function callOpenAI(array $messages, array $tools): string
     {
-        if ($this->apiKey === 'sk-dummy-key-for-testing') {
+        $isValidKey = (strpos($this->apiKey, 'sk-') === 0) && ($this->apiKey !== 'sk-dummy-key-for-testing');
+        
+        error_log("API Key Status: " . ($isValidKey ? "Valid key found" : "Using dummy key"));
+        
+        if (!$isValidKey) {
             return json_encode([
                 'choices' => [
                     [
                         'message' => [
-                            'content' => 'This is a simulated response since we are using a dummy API key. In production, this would be a real response from the selected model.'
+                            'content' => 'This is a simulated response since we are using a dummy API key. In production, this would be a real response from the selected model. To use the real API, set OPENAI_API_KEY in your .env file.'
                         ]
                     ]
                 ]
@@ -313,6 +317,8 @@ class ChatService
             $body['function_call'] = 'auto';
         }
 
+        error_log("Sending request to OpenAI API. Model: " . $model);
+        
         $ch = curl_init('https://api.openai.com/v1/chat/completions');
         curl_setopt_array($ch, [
             CURLOPT_HTTPHEADER     => [
@@ -343,6 +349,7 @@ class ChatService
             return json_encode(['error'=>'Empty response']);
         }
 
+        error_log("Received successful response from OpenAI API");
         return $response;
     }
 
