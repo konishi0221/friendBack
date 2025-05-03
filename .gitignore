@@ -6,6 +6,8 @@
 .env
 .env.local
 .env.*.local
+src/frontend/.env
+*/**/.env
 
 # Service account keys and credentials
 *.key
