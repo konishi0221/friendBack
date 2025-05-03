@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'personal-ai-assistant-v1';
+const CACHE_NAME = 'personal-ai-assistant-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -9,13 +9,11 @@ const ASSETS_TO_CACHE = [
 ];
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
         return cache.addAll(ASSETS_TO_CACHE);
-      })
-      .then(() => {
-        return self.skipWaiting();
       })
   );
 });
@@ -37,11 +35,27 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') {
+    return;
+  }
+  
   if (!event.request.url.startsWith(self.location.origin)) {
     return;
   }
 
+  if (event.request.url.includes('ws:') || 
+      event.request.url.includes('wss:') || 
+      event.request.headers.get('Upgrade') === 'websocket') {
+    return;
+  }
+
   if (event.request.url.includes('/api/')) {
+    return;
+  }
+  
+  if (event.request.url.includes('hot-update') || 
+      event.request.url.includes('__vite_hmr') ||
+      event.request.url.includes('?t=')) {
     return;
   }
 
@@ -66,6 +80,13 @@ self.addEventListener('fetch', (event) => {
               });
 
             return response;
+          })
+          .catch((error) => {
+            console.error('Fetch failed:', error);
+            if (event.request.mode === 'navigate') {
+              return caches.match('/');
+            }
+            throw error;
           });
       })
   );

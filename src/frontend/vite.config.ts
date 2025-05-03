@@ -26,7 +26,37 @@ export default defineConfig({
             type: 'image/png'
           }
         ]
+      },
+      workbox: {
+        skipWaiting: true,
+        navigateFallbackDenylist: [/\/api\//],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/api\.openai\.com\/.*/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'openai-api-cache',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 // 24 hours
+              }
+            }
+          }
+        ]
       }
     })
   ],
+  server: {
+    hmr: {
+      protocol: 'ws',
+      host: 'localhost'
+    },
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        secure: false
+      }
+    }
+  }
 })
