@@ -1,0 +1,9 @@
+node_modules
+src/frontend/node_modules
+.git
+.gitignore
+.env
+*.key
+*.pem
+*-key.json
+service-account-key.json

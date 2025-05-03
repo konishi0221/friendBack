@@ -7,9 +7,14 @@
     "build:frontend": "cd src/frontend && npm run build",
     "postbuild:frontend": "rm -rf public/assets && cp -r src/frontend/dist/* public/",
     "install:frontend": "cd src/frontend && npm install",
-    "dev:backend": "php -S localhost:8000 -t public",
+    "dev:backend": "php -S localhost:8000 -t public public/router.php",
     "dev": "npm run build:frontend && npm run dev:backend",
-    "setup": "npm run install:frontend && npm run build:frontend"
+    "setup": "npm run install:frontend && npm run build:frontend",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:start": "npm run docker:build && npm run docker:up"
   },
   "author": "",
   "license": "ISC"
