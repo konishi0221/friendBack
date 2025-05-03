@@ -359,17 +359,13 @@ async function sendWithFile() {
       ? `${inputText.value.trim()} [ファイル: ${selectedFile.value.name}]` 
       : `[ファイル: ${selectedFile.value.name}]`
     
-    // Ensure messages array is initialized before pushing
-    if (messages && messages.value) {
-      messages.value.push({
-        role: 'user',
-        content: fileMessage,
-        hasFile: true,
-        fileName: selectedFile.value.name
-      })
-    } else {
-      console.error('Messages array is not initialized')
-    }
+    // Use chat store directly to push messages
+    chat.messages.value.push({
+      role: 'user',
+      content: fileMessage,
+      hasFile: true,
+      fileName: selectedFile.value.name
+    })
     
     // Reset input
     inputText.value = ''
@@ -389,8 +385,8 @@ async function sendWithFile() {
     console.log('Upload result:', result)
     
     // Add AI response
-    if (result.message && messages && messages.value) {
-      messages.value.push({
+    if (result.message) {
+      chat.messages.value.push({
         role: 'assistant',
         content: result.message
       })
