@@ -68,15 +68,16 @@
 
     <!-- Input bar -->
     <form class="input-bar" @submit.prevent="submit">
+      <!-- Always include file input but hide it -->
+      <input 
+        type="file" 
+        ref="fileInput" 
+        @change="handleFileSelected" 
+        accept="image/*,.pdf,.doc,.docx,.txt"
+        style="display: none"
+      />
+      
       <div class="file-upload" v-if="showFileUpload">
-        <input 
-          type="file" 
-          ref="fileInput" 
-          @change="handleFileSelected" 
-          accept="image/*,.pdf,.doc,.docx,.txt"
-          capture="environment"
-          style="display: none"
-        />
         <div class="upload-preview" v-if="selectedFile">
           <div class="file-info">
             <span class="file-name">{{ selectedFile.name }}</span>
@@ -129,6 +130,8 @@ import { isLaunchedFromHomeScreen as importedIsLaunchedFromHomeScreen } from '..
 
 const router = useRouter()
 const apiUrl = import.meta.env.VITE_API_URL || '/api'
+console.log('API URL from env:', import.meta.env.VITE_API_URL)
+console.log('Final API URL used:', apiUrl)
 
 // Get isLaunchedFromHomeScreen from injection or use imported function as fallback
 const isLaunchedFromHomeScreen = inject('isLaunchedFromHomeScreen', importedIsLaunchedFromHomeScreen)
@@ -188,6 +191,11 @@ onMounted(async () => {
     
     window.addEventListener('drop', (e) => {
       e.preventDefault()
+    })
+    
+    // Ensure fileInput ref is initialized after component is mounted
+    nextTick(() => {
+      console.log('File input element after nextTick:', fileInput.value)
     })
   } catch (err) {
     console.error('Error initializing chat:', err)
@@ -351,12 +359,17 @@ async function sendWithFile() {
       ? `${inputText.value.trim()} [ファイル: ${selectedFile.value.name}]` 
       : `[ファイル: ${selectedFile.value.name}]`
     
-    messages.value.push({
-      role: 'user',
-      content: fileMessage,
-      hasFile: true,
-      fileName: selectedFile.value.name
-    })
+    // Ensure messages array is initialized before pushing
+    if (messages && messages.value) {
+      messages.value.push({
+        role: 'user',
+        content: fileMessage,
+        hasFile: true,
+        fileName: selectedFile.value.name
+      })
+    } else {
+      console.error('Messages array is not initialized')
+    }
     
     // Reset input
     inputText.value = ''
@@ -376,7 +389,7 @@ async function sendWithFile() {
     console.log('Upload result:', result)
     
     // Add AI response
-    if (result.message) {
+    if (result.message && messages && messages.value) {
       messages.value.push({
         role: 'assistant',
         content: result.message
@@ -389,10 +402,12 @@ async function sendWithFile() {
     
   } catch (err) {
     console.error('File upload error:', err)
-    messages.value.push({
-      role: 'system',
-      content: `ファイルのアップロードに失敗しました: ${err.message}`
-    })
+    if (messages && messages.value) {
+      messages.value.push({
+        role: 'system',
+        content: `ファイルのアップロードに失敗しました: ${err.message}`
+      })
+    }
   }
 }
 
