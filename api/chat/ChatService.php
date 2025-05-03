@@ -362,7 +362,13 @@ class ChatService
                 'description'=>'Retrieve compressed memories from previous conversations',
                 'parameters'=>[
                     'type'=>'object',
-                    'properties'=>[]
+                    'properties'=>[
+                        'limit'=>[
+                            'type'=>'integer',
+                            'description'=>'Maximum number of memories to retrieve',
+                            'default'=>10
+                        ]
+                    ]
                 ]
             ]],
             [ 'type'=>'function','function'=>[
