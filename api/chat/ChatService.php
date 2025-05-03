@@ -289,15 +289,22 @@ class ChatService
                 'choices' => [
                     [
                         'message' => [
-                            'content' => 'This is a simulated response since we are using a dummy API key. In production, this would be a real response from GPT-4o.'
+                            'content' => 'This is a simulated response since we are using a dummy API key. In production, this would be a real response from the selected model.'
                         ]
                     ]
                 ]
             ]);
         }
         
+        $context = $this->db->getContext($this->userId);
+        $model = $context['model'] ?? 'gpt-4o'; // Default to GPT-4o if not specified
+        
+        if ($model !== 'gpt-3.5-turbo' && $model !== 'gpt-4o') {
+            $model = 'gpt-4o'; // Default to GPT-4o if invalid model
+        }
+        
         $body = [
-            'model'       => 'gpt-4o',
+            'model'       => $model,
             'messages'    => $messages,
             'temperature' => 0.7
         ];

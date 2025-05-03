@@ -1,0 +1,16 @@
+{
+  "name": "personal-ai-assistant",
+  "version": "1.0.0",
+  "description": "Personal AI Assistant with Vue frontend and PHP backend",
+  "scripts": {
+    "dev:frontend": "cd src/frontend && npm run dev",
+    "build:frontend": "cd src/frontend && npm run build",
+    "postbuild:frontend": "rm -rf public/assets && cp -r src/frontend/dist/* public/",
+    "install:frontend": "cd src/frontend && npm install",
+    "dev:backend": "php -S localhost:8000 -t public",
+    "dev": "npm run build:frontend && npm run dev:backend",
+    "setup": "npm run install:frontend && npm run build:frontend"
+  },
+  "author": "",
+  "license": "ISC"
+}
