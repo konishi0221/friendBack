@@ -5,10 +5,6 @@
     @dragleave.prevent="handleDragLeave"
     @drop.prevent="handleDrop"
   >
-    <!-- Mobile upload button -->
-    <div class="mobile-upload-button" @click="triggerFileInput" title="画像をアップロード">
-      <span class="material-icons">photo_camera</span>
-    </div>
     
     <div class="drag-overlay" v-if="isDragging">
       <div class="drag-message">
@@ -99,8 +95,8 @@
       </div>
       
       <div class="input-row">
-        <button type="button" class="toggle-upload-btn" @click="toggleFileUpload" title="ファイルをアップロード">
-          <span class="material-icons">{{ showFileUpload ? 'keyboard' : 'attach_file' }}</span>
+        <button type="button" class="file-btn" @click="triggerFileInput" title="ファイルをアップロード">
+          <span class="material-icons">attach_file</span>
         </button>
         
         <textarea
@@ -258,13 +254,6 @@ function handleDrop(event) {
 }
 
 /* File upload functions */
-function toggleFileUpload() {
-  showFileUpload.value = !showFileUpload.value
-  if (!showFileUpload.value) {
-    removeFile()
-  }
-}
-
 function triggerFileInput() {
   if (fileInput.value) {
     fileInput.value.click()
@@ -287,6 +276,9 @@ function handleFileSelected(event) {
   } else {
     filePreview.value = null
   }
+  
+  // Show the file upload area
+  showFileUpload.value = true
 }
 
 function removeFile() {
@@ -600,7 +592,7 @@ function goToCall() {
   gap: 8px;
 }
 
-.toggle-upload-btn {
+.file-btn {
   background: #f5f7fa;
   border: 1px solid #e2e8f0;
   color: var(--secondary-color);
@@ -614,12 +606,12 @@ function goToCall() {
   transition: all 0.2s ease;
 }
 
-.toggle-upload-btn:hover {
+.file-btn:hover {
   background-color: #edf2f7;
   color: var(--primary-color);
 }
 
-.toggle-upload-btn:active {
+.file-btn:active {
   transform: scale(0.95);
 }
 
@@ -841,7 +833,7 @@ function goToCall() {
   gap: 8px;
 }
 
-.toggle-upload-btn {
+.file-btn {
   background: #f5f7fa;
   border: 1px solid #e2e8f0;
   color: var(--secondary-color);
@@ -855,12 +847,12 @@ function goToCall() {
   transition: all 0.2s ease;
 }
 
-.toggle-upload-btn:hover {
+.file-btn:hover {
   background-color: #edf2f7;
   color: var(--primary-color);
 }
 
-.toggle-upload-btn:active {
+.file-btn:active {
   transform: scale(0.95);
 }
 
@@ -922,32 +914,8 @@ function goToCall() {
   margin-right: 4px;
 }
 
-/* Mobile upload button */
-.mobile-upload-button {
-  position: fixed;
-  bottom: 70px;
-  right: 20px;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background-color: var(--primary-color);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  z-index: 100;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.mobile-upload-button:active {
-  transform: scale(0.95);
-}
-
+/* Mobile styles */
 @media (min-width: 768px) {
-  .mobile-upload-button {
-    display: none;
-  }
+  /* Desktop-specific styles */
 }
 </style>
