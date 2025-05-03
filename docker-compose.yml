@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8082:80"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - ./frontend/src:/var/www/html/frontend/src
+      - ./backend/api:/var/www/html/api
+      - ./backend/public:/var/www/html/public
