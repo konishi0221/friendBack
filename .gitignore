@@ -19,6 +19,7 @@ service-account-key.json
 /public/assets
 /public/build
 /public/dist
+/public/uploads
 
 # Logs
 *.log
