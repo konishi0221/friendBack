@@ -1,0 +1,16 @@
+# Enable URL rewriting
+RewriteEngine On
+
+# Set the base directory
+RewriteBase /
+
+# Redirect API requests to the API directory
+RewriteRule ^api/(.*)$ ../api/$1 [L]
+
+# Serve static files directly
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Serve the frontend for all other requests
+RewriteRule ^ index.html [L]
