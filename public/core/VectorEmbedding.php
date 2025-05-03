@@ -1,14 +1,8 @@
 <?php
 declare(strict_types=1);
 
-require_once __DIR__ . '/../../vendor/autoload.php';
-
-use OpenAI\Client;
-use OpenAI\Factory;
-
 class VectorEmbedding
 {
-    private Client $client;
     private static ?VectorEmbedding $instance = null;
     private string $apiKey;
     private string $model = 'text-embedding-3-small';
@@ -21,12 +15,6 @@ class VectorEmbedding
     private function __construct(string $apiKey)
     {
         $this->apiKey = $apiKey;
-        
-        try {
-            $this->client = (new Factory())->withApiKey($apiKey)->make();
-        } catch (\Exception $e) {
-            error_log("OpenAI client initialization error: " . $e->getMessage());
-        }
     }
     
     /**
@@ -57,12 +45,37 @@ class VectorEmbedding
         }
         
         try {
-            $response = $this->client->embeddings()->create([
-                'model' => $this->model,
-                'input' => $text,
+            $ch = curl_init('https://api.openai.com/v1/embeddings');
+            curl_setopt_array($ch, [
+                CURLOPT_HTTPHEADER     => [
+                    'Content-Type: application/json',
+                    'Authorization: Bearer '.$this->apiKey
+                ],
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST           => true,
+                CURLOPT_POSTFIELDS     => json_encode([
+                    'model' => $this->model,
+                    'input' => $text
+                ])
             ]);
             
-            return $response->embeddings[0]->embedding;
+            $response = curl_exec($ch);
+            $err      = curl_error($ch);
+            $info     = curl_getinfo($ch);
+            curl_close($ch);
+            
+            if ($err) {
+                error_log("CURL_ERR: ".$err);
+                return null;
+            }
+            
+            if ($info['http_code'] !== 200) {
+                error_log("HTTP=".$info['http_code']." BODY=".$response);
+                return null;
+            }
+            
+            $data = json_decode($response, true);
+            return $data['data'][0]['embedding'] ?? null;
         } catch (\Exception $e) {
             error_log("OpenAI embedding error: " . $e->getMessage());
             return null;
